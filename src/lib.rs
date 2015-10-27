@@ -5,12 +5,13 @@
 use std::any::{Any, TypeId};
 use std::mem;
 
-/// Something that 
+/// The building block trait for recursive variadics.
 pub trait RecursiveVariadic {
-    // would be nice to have a 
-    // type Data<T> = T 
+    /// Try to get the field of type N.
     fn get<N: Any>(&self) -> Option<&N>;
+    /// Try to get the field of type N mutably.
     fn get_mut<N: Any>(&mut self) -> Option<&mut N>;
+    /// Add a field of type N to this.
     fn and<N: Any>(self, val: N) -> Entry<N, Self> where Self: Sized {
         Entry {
             data: val,
@@ -19,12 +20,14 @@ pub trait RecursiveVariadic {
     }
 }
 
+/// The base case for recursive variadics: no fields.
 pub type Empty = ();
 impl RecursiveVariadic for Empty {
     fn get<N: Any>(&self) -> Option<&N> { None }
     fn get_mut<N: Any>(&mut self) -> Option<&mut N> { None }
 }
 
+/// Wraps some field data and a parent, which is either another Entry or Empty
 pub struct Entry<T, R> {
     data: T,
     parent: R,
